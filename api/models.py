@@ -7,12 +7,12 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.TextField()
-    slug = models.TextField()
+    slug = models.SlugField(unique=True)
 
 
 class Genre(models.Model):
     name = models.TextField()
-    slug = models.TextField()
+    slug = models.SlugField(unique=True)
 
 
 class Title(models.Model):
