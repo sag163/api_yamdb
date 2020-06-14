@@ -24,6 +24,3 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(review_router.urls)),
 ]
-
-
-
