@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins, filters, permissions
 from django.shortcuts import render
 from rest_framework.response import Response
+
 from .models import (Category, 
                     Genre, 
                     Title, 
@@ -13,15 +14,19 @@ from .serializers import (CategorySerializer,
                          CommentSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 
+from rest_framework.pagination import PageNumberPagination
+
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['slug', ]
     lookup_field = 'slug'
+
 
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
@@ -29,17 +34,20 @@ class GenreViewSet(mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['slug', ] 
+    filterset_fields = ['slug', ]
     lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category', 'genre', 'year', ]
     search_fields = ['name', ]
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
