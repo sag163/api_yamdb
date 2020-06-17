@@ -1,5 +1,6 @@
 from django.urls import path, include
 from django.conf import settings
+from .views import Signup
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -7,6 +8,7 @@ from rest_framework_simplejwt.views import (
 #from .views import signup
 
 urlpatterns = [
+    path('auth/email/', Signup.as_view({'post': 'create'})),
     path('auth/', include('djoser.urls')),
 #    path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
