@@ -8,7 +8,7 @@ class User(AbstractUser):
         ('user', 'user'),
     ]
     confirmation_code = models.IntegerField(blank=True, null=True) #, write_only=True)
-    is_active = models.BooleanField(default=False)
+#    is_active = models.BooleanField(default=False)
     role = models.CharField(choices=STATUS_CHOICESS, max_length=50, default='user')
 
 

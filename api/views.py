@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import UserProfileSerializers
+from .serializers import UserSerializers
 from .models import User
 from django.core.mail import send_mail
 import random
@@ -16,15 +16,15 @@ def generate_code():
 
 class Signup(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserProfileSerializers
+    serializer_class = UserSerializers
 
-    def create(self, request, *args, **kwargs):
-        serializer = UserProfileSerializers(data=request.data, context={'request': request})
-        if serializer.is_valid(): #raise_exception=True):
-            user = serializer.save(comit=False)
-            user.confirmation_code = generate_code()
-            user.save()
-            return Response(user.data)
+#    def create(self, request, *args, **kwargs):
+#        serializer = UserSerializers(data=request.data, context={'request': request})
+#        if serializer.is_valid(raise_exception=True):
+#            serializer.save() #comit=False)
+#            user.confirmation_code = generate_code()
+#            user.save()
+#            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 '''
 class Signup(APIView):

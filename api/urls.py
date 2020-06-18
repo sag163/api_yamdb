@@ -9,9 +9,9 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('auth/email/', Signup.as_view({'post': 'create'})),
-    path('auth/', include('djoser.urls')),
-#    path('auth/', include('djoser.urls.authtoken')),
-    path('auth/', include('djoser.urls.jwt')),
+    #path('auth/', include('djoser.urls')),
+    #path('auth/', include('djoser.urls.authtoken')),
+    #path('auth/', include('djoser.urls.jwt')),
 #    path('auth/email/', signup),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
