@@ -1,15 +1,20 @@
-from rest_framework import viewsets, mixins, filters
+from rest_framework import viewsets, mixins, filters, permissions
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
+
+from .models import (Category, 
+                    Genre, 
+                    Title, 
+                    Review, 
+                    Comment)
+from .serializers import (CategorySerializer,
+                         GenreSerializer,
+                         TitleSerializer,
+                         ReviewSerializer,
+                         CommentSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Category, Genre, Title, Review
-from .serializers import (CategorySerializer,
-                          GenreSerializer,
-                          TitleSerializer,
-                          ReviewSerializer)
-
+from rest_framework.pagination import PageNumberPagination
 
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
@@ -47,8 +52,20 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-
-    def list(self, requests, title_id):
-        review = Review.objects.filter(title=title_id)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    def list(self, requests, titles_pk):
+        review = Review.objects.filter(title=titles_pk)
         serializer = ReviewSerializer(review, many=True)
         return Response(serializer.data)
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
