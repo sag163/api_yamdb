@@ -4,25 +4,35 @@ from rest_framework.exceptions import ValidationError
 from .models import Category, Genre, Title, Review, Comment
 
 
+class CustomSlugRelatedField(serializers.SlugRelatedField):
+    def to_representation(self, obj):
+        # return {'name': obj.name, 'slug': obj.slug} # страница выдаёт ошибку unhashable type: 'dict'
+        return f"'name': {obj.name}, 'slug': {obj.slug}" # эта строчка не проходит тесты из-за ковычек
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('id', 'name', 'slug')
+        fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-     class Meta:
-        fields = ('id', 'name', 'slug')
+    class Meta:
+        fields = ('name', 'slug')
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
-        id = serializers.ReadOnlyField()
-        genre = serializers.ReadOnlyField()
-        category = serializers.ReadOnlyField()
-        class Meta:
-                fields = ('id', 'name', 'year', 'genre', 'category')
-                model = Title
+    rating = serializers.ReadOnlyField()
+    category = CustomSlugRelatedField(queryset=Category.objects.all(), 
+                                     slug_field='slug')
+    genre = CustomSlugRelatedField(queryset=Genre.objects.all(),
+                                   slug_field='slug',
+                                   many=True)
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        model = Title    
 
 
 class ReviewSerializer(serializers.ModelSerializer):

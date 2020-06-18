@@ -23,8 +23,8 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['slug', ]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
     lookup_field = 'slug'
 
 
@@ -35,8 +35,8 @@ class GenreViewSet(mixins.CreateModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['slug', ]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
     lookup_field = 'slug'
 
 
