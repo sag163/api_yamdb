@@ -1,13 +1,25 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Category, Genre, Title, Review, Comment
+from .models import User, Category, Genre, Title, Review, Comment
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
+        model = User
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
+        model = User
 
 
 class CustomSlugRelatedField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        # return {'name': obj.name, 'slug': obj.slug} # страница выдаёт ошибку unhashable type: 'dict'
-        return f"'name': {obj.name}, 'slug': {obj.slug}" # эта строчка не проходит тесты из-за ковычек
+    def to_representation(self, value):
+        return {'name': value.name, 'slug': value.slug}
+        #return value.name
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,10 +37,10 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.ReadOnlyField()
     category = CustomSlugRelatedField(queryset=Category.objects.all(), 
-                                     slug_field='slug')
+                                            slug_field='slug')
     genre = CustomSlugRelatedField(queryset=Genre.objects.all(),
-                                   slug_field='slug',
-                                   many=True)
+                                         slug_field='slug',
+                                         many=True)
 
     class Meta:
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')

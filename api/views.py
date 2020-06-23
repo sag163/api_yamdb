@@ -1,20 +1,43 @@
 from rest_framework import viewsets, mixins, filters, permissions
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import render
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
-from .models import (Category, 
-                    Genre, 
-                    Title, 
-                    Review, 
-                    Comment)
-from .serializers import (CategorySerializer,
-                         GenreSerializer,
-                         TitleSerializer,
-                         ReviewSerializer,
-                         CommentSerializer)
-from django_filters.rest_framework import DjangoFilterBackend
+from .models import (User,
+                     Category,
+                     Genre,
+                     Title,
+                     Review,
+                     Comment)
+from .serializers import (UserSerializer,
+                          UserMeSerializer,
+                          CategorySerializer,
+                          GenreSerializer,
+                          TitleSerializer,
+                          ReviewSerializer,
+                          CommentSerializer)
 
-from rest_framework.pagination import PageNumberPagination
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
+    lookup_field = 'username'
+
+
+class UserMeViewSet(mixins.ListModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
+    serializer_class = UserMeSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = get_object_or_404(User, id=self.request.user.id)
+
 
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
