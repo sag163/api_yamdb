@@ -1,53 +1,45 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
-from .serializers import UserSerializers
-from .models import User
-from django.core.mail import send_mail
-import random
 from rest_framework.response import Response
-#from rest_framework import generics
-from rest_framework import viewsets
-# Create your views here.
+from rest_framework import generics, viewsets, permissions
+from rest_framework.views import APIView
+from .serializers import UserSerializers, UserAvtorizaytion
+from .models import User
+import random
+from django.core.mail import send_mail
+from rest_framework.exceptions import ValidationError
 
-def generate_code():
-    random.seed()
-    return str(random.randint(10000,99999))
 
 
-class Signup(viewsets.ModelViewSet):
+class Signup(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializers
+    permission_classes = [permissions.AllowAny]
 
-#    def create(self, request, *args, **kwargs):
-#        serializer = UserSerializers(data=request.data, context={'request': request})
-#        if serializer.is_valid(raise_exception=True):
-#            serializer.save() #comit=False)
-#            user.confirmation_code = generate_code()
-#            user.save()
-#            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-'''
-class Signup(APIView):
-    
-    def post(self, request):
-        serializer = UserProfileSerializers(data=request.POST)
-        if serializer.is_valid:
-            user = serializer.save(commit=False)
-            user.confirmation_code = generate_code()
-            user.username = request.user
-#            user.password = serializer.cleaned_data['password']
-            user.save()
-
-#            serializer.save(username=request.user)
-#        user = UserProfile.objects.get(username=request.user)
-        if user.is_active == False:
-            user.confirmation_code = generate_code()
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.confirmation_code = serializer.validated_data['confirmation_code']
+            serializer.email = serializer.validated_data['email']
+            serializer.save()
+            print(serializer)
             send_mail(
-                'авторизация',
-                f'бла бла {user.confirmation_code}',
-                'my@my.my',
-                'toto@to.to',
+                'Авторизация',
+                f'Для авторизации перейдите по ссылке "http://127.0.0.1:8000/api/v1/auth/token/" с параметрами: confirmation_code = {serializer.confirmation_code} email = {serializer.email}',
+                'mi@mi.mi',
+                [f'{serializer.email}'],
                 fail_silently=False,
             )
-        return Response(serializer.data)
-'''
+            return Response(serializer.data)
+
+class Avtorizeytion(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = UserAvtorizaytion(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            return Response({'token': serializer.validated_data['token']})
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializers
+    permission_classes = [permissions.IsAuthenticated]

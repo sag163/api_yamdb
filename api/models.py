@@ -7,8 +7,14 @@ class User(AbstractUser):
         ('moderator', 'moderator'),
         ('user', 'user'),
     ]
-    confirmation_code = models.IntegerField(blank=True, null=True) #, write_only=True)
-#    is_active = models.BooleanField(default=False)
+
+    username = None
+    email = models.EmailField(unique=True)
+    confirmation_code = models.IntegerField(blank=True, null=True)
     role = models.CharField(choices=STATUS_CHOICESS, max_length=50, default='user')
+    bio = models.CharField(max_length=500, blank=True, null=True)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
+# Create your models here.

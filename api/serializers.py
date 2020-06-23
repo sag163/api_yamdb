@@ -1,33 +1,48 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import User
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from .models import User
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+import random
 
-#User = get_user_model
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+def generate_code():
+    random.seed()
+    return str(random.randint(10000000,99999999))
 
 class UserSerializers(serializers.ModelSerializer):
+    
     class Meta:
         model = User
-        fields = ("username", "email", 'password') 
+        fields = ("email",)
     
     def validate(self, data):
-        user = data['username']
-        email = data['email']
-        profil = get_object_or_404(User, username=user, email=email)
-        if profil:
-            raise ValidationError()
+        confirmation_code = generate_code()
+        data['confirmation_code'] = confirmation_code
         return data
-    
-#    def create(self, validated_data):
-#        user = validated_data['username']
-#        email = validated_data['email']
-#        role = validated_data['role']
-#        password = validated_data['password']
-#        User.objects.create_user(
-#            user=user,
-#            email=email,
-#            role=role,
-#            password=password,
-#        )
-#        return validated_data
+
+class UserAvtorizaytion(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    class Meta:
+        model = User
+        fields = ('email', 'confirmation_code',)
+
+    def validate(self, data):
+        email = data['email']
+        confirmation_code = data['confirmation_code']
+        profile = get_object_or_404(User, email=email)
+        if profile.confirmation_code != confirmation_code:
+            raise ValidationError('ошибка')
+        else:
+            token = get_tokens_for_user(profile)
+            data['token'] = token
+        return data
+        
