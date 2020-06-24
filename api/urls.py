@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from .views import (Signup, Avtorizeytion
+from .views import (Signup, Avtorizeytion,
                     UserViewSet, UserMeViewSet,
                     TitleViewSet, CategoryViewSet, GenreViewSet,
                     ReviewViewSet, CommentViewSet)
@@ -30,6 +30,5 @@ urlpatterns = [
     path('auth/email/', Signup.as_view()),
     path('auth/token/', Avtorizeytion.as_view()),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('users/', UserList.as_view()),
 ]
 

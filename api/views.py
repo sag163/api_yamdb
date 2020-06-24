@@ -74,6 +74,8 @@ class UserMeViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         queryset = get_object_or_404(User, id=self.request.user.id)
+
+
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
