@@ -1,20 +1,61 @@
-from rest_framework import viewsets, mixins, filters, permissions
-from django.shortcuts import render
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
+import random
+from django.core.mail import send_mail
+from rest_framework.exceptions import ValidationError
+from rest_framework import viewsets, mixins, filters, permissions, generics
 from .models import (Category, 
                     Genre, 
                     Title, 
                     Review, 
-                    Comment)
+                    Comment,
+                    User,)
 from .serializers import (CategorySerializer,
                          GenreSerializer,
                          TitleSerializer,
                          ReviewSerializer,
-                         CommentSerializer)
+                         CommentSerializer,
+                         UserSerializers,
+                         UserAvtorizaytion)
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.pagination import PageNumberPagination
+
+
+
+class Signup(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializers
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.confirmation_code = serializer.validated_data['confirmation_code']
+            serializer.email = serializer.validated_data['email']
+            serializer.save()
+            print(serializer)
+            send_mail(
+                'Авторизация',
+                f'Для авторизации перейдите по ссылке "http://127.0.0.1:8000/api/v1/auth/token/" с параметрами: confirmation_code = {serializer.confirmation_code} email = {serializer.email}',
+                'mi@mi.mi',
+                [f'{serializer.email}'],
+                fail_silently=False,
+            )
+            return Response(serializer.data)
+
+class Avtorizeytion(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = UserAvtorizaytion(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            return Response({'token': serializer.validated_data['token']})
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializers
+    permission_classes = [permissions.IsAuthenticated]
 
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
@@ -68,4 +109,4 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
+        

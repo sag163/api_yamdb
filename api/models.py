@@ -1,8 +1,21 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 
+class User(AbstractUser):
+    STATUS_CHOICESS = [
+        ('admin', 'admin'),
+        ('moderator', 'moderator'),
+        ('user', 'user'),
+    ]
 
+    username = None
+    email = models.EmailField(unique=True)
+    confirmation_code = models.IntegerField(blank=True, null=True)
+    role = models.CharField(choices=STATUS_CHOICESS, max_length=50, default='user')
+    bio = models.CharField(max_length=500, blank=True, null=True)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
 class Category(models.Model):
     name = models.TextField()
@@ -17,7 +30,6 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Title(models.Model):
     name = models.TextField()
