@@ -3,12 +3,12 @@ from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Category, Genre, Title, Review, Comment, User
+from .models import User, Category, Genre, Title, Review, Comment
 import random
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
@@ -17,6 +17,7 @@ def get_tokens_for_user(user):
 def generate_code():
     random.seed()
     return str(random.randint(10000000,99999999))
+
 
 class UserSerializers(serializers.ModelSerializer):
     
@@ -45,11 +46,18 @@ class UserAvtorizaytion(serializers.ModelSerializer):
             token = get_tokens_for_user(profile)
             data['token'] = token
         return data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
+        model = User
         
+
 class CustomSlugRelatedField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        # return {'name': obj.name, 'slug': obj.slug} # страница выдаёт ошибку unhashable type: 'dict'
-        return f"'name': {obj.name}, 'slug': {obj.slug}" # эта строчка не проходит тесты из-за ковычек
+    def to_representation(self, value):
+        #return {'name': value.name, 'slug': value.slug} # для успешного прохождения тесто
+        return value.name
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -67,10 +75,10 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.ReadOnlyField()
     category = CustomSlugRelatedField(queryset=Category.objects.all(), 
-                                     slug_field='slug')
+                                            slug_field='slug')
     genre = CustomSlugRelatedField(queryset=Genre.objects.all(),
-                                   slug_field='slug',
-                                   many=True)
+                                         slug_field='slug',
+                                         many=True)
 
     class Meta:
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')

@@ -5,17 +5,15 @@ from rest_framework_simplejwt.views import (
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from .views import (CategoryViewSet, GenreViewSet,
-                    TitleViewSet,
-                    ReviewViewSet,
-                    CommentViewSet,
-                    Signup,
-                    Avtorizeytion,
-                    UserList,
-                    )
+from .views import (Signup, Avtorizeytion
+                    UserViewSet, UserMeViewSet,
+                    TitleViewSet, CategoryViewSet, GenreViewSet,
+                    ReviewViewSet, CommentViewSet)
 
 
 router = DefaultRouter()
+router.register('users/me', UserMeViewSet, basename='users_me')
+router.register('users', UserViewSet, basename='users')
 router.register('categories', CategoryViewSet, basename='categories')
 router.register('genres', GenreViewSet, basename='genres')
 router.register('titles', TitleViewSet, basename='titles')

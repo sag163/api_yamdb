@@ -4,22 +4,26 @@ import random
 from django.core.mail import send_mail
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, filters, permissions, generics
-from .models import (Category, 
-                    Genre, 
-                    Title, 
-                    Review, 
-                    Comment,
-                    User,)
-from .serializers import (CategorySerializer,
-                         GenreSerializer,
-                         TitleSerializer,
-                         ReviewSerializer,
-                         CommentSerializer,
-                         UserSerializers,
-                         UserAvtorizaytion)
+from .models import (User,
+                     Category, 
+                     Genre, 
+                     Title, 
+                     Review, 
+                     Comment)
+from .serializers import (UserSerializer,
+                          CategorySerializer,
+                          GenreSerializer,
+                          TitleSerializer,
+                          ReviewSerializer,
+                          CommentSerializer,
+                          UserSerializers,
+                          UserAvtorizaytion)
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
+
 
 
 
@@ -52,11 +56,24 @@ class Avtorizeytion(APIView):
         if serializer.is_valid(raise_exception=True):
             return Response({'token': serializer.validated_data['token']})
 
-class UserList(generics.ListAPIView):
+     
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializers
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
+    lookup_field = 'username'
 
+
+class UserMeViewSet(mixins.ListModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
+    serializer_class = UserSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = get_object_or_404(User, id=self.request.user.id)
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
