@@ -12,7 +12,6 @@ from .models import (User,
                      Review,
                      Comment)
 from .serializers import (UserSerializer,
-                          UserMeSerializer,
                           CategorySerializer,
                           GenreSerializer,
                           TitleSerializer,
@@ -32,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserMeViewSet(mixins.ListModelMixin,
                     mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
-    serializer_class = UserMeSerializer
+    serializer_class = UserSerializer
     pagination_class = None
 
     def get_queryset(self):

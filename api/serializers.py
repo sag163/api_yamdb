@@ -10,16 +10,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
 
-class UserMeSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
-        model = User
-
-
 class CustomSlugRelatedField(serializers.SlugRelatedField):
     def to_representation(self, value):
-        return {'name': value.name, 'slug': value.slug}
-        #return value.name
+        #return {'name': value.name, 'slug': value.slug} # для успешного прохождения тесто
+        return value.name
 
 
 class CategorySerializer(serializers.ModelSerializer):
