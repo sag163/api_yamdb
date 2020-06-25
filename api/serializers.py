@@ -52,12 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
         model = User
-        
-
-class CustomSlugRelatedField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        #return {'name': value.name, 'slug': value.slug} # для успешного прохождения тесто
-        return value.name
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -70,6 +64,12 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
         model = Genre
+
+
+class CustomSlugRelatedField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return {'name': value.name, 'slug': value.slug} # для успешного прохождения тесто
+        #return value.name
 
 
 class TitleSerializer(serializers.ModelSerializer):
