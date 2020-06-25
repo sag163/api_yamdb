@@ -68,14 +68,20 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
 
-class UserMeViewSet(mixins.ListModelMixin,
+class UserMeViewSet(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     serializer_class = UserSerializer
     pagination_class = None
+    lookup_field = None
 
     def get_queryset(self):
-        queryset = get_object_or_404(User, id=self.request.user.id)
+        queryset = User.objects.filter(email=self.request.user).all()
+        return queryset
+
+    def get_object(self):
+        obj = self.get_queryset().get()
+        return obj
 
 
 class CategoryViewSet(mixins.CreateModelMixin,

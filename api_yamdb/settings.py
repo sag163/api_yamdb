@@ -132,10 +132,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    # закомментил, чтобы тесты проходили
-    #'DEFAULT_PERMISSION_CLASSES': [
-    #    'rest_framework.permission.IsAuthenticated',
-    #],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': 100,
     'DEFAULT_FILTER_BACKENDS': [
@@ -149,7 +148,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=500),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('jwt',),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 AUTH_USER_MODEL = "api.User"
