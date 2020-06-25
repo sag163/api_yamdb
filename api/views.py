@@ -18,6 +18,8 @@ from .serializers import (UserSerializer,
                           CommentSerializer,
                           UserSerializers,
                           UserAvtorizaytion)
+from .filters import CustomFilterBackend
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -104,9 +106,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category', 'genre', 'year', ]
-    search_fields = ['name', ]
+    filter_backends = [CustomFilterBackend]
+    filterset_fields = ['category', 'genre', 'year', 'name']
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
