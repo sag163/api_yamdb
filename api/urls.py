@@ -12,7 +12,6 @@ from .views import (Signup, Avtorizeytion,
 
 
 router = DefaultRouter()
-router.register('users/me', UserMeViewSet, basename='users_me')
 router.register('users', UserViewSet, basename='users')
 router.register('categories', CategoryViewSet, basename='categories')
 router.register('genres', GenreViewSet, basename='genres')
@@ -24,6 +23,7 @@ comment_router.register(r'comments', CommentViewSet, basename="comment")
 
 
 urlpatterns = [
+    path('users/me/', UserMeViewSet.as_view({'get': 'retrieve', 'patch': 'partial_update'})),
     path('', include(router.urls)),
     path('', include(review_router.urls)),
     path('', include(comment_router.urls)),
