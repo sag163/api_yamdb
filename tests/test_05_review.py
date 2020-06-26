@@ -230,6 +230,7 @@ class Test05ReviewAPI:
         reviews, titles, user, moderator = create_reviews(user_client, admin)
         data = {'text': 'jdfk', 'score': 7}
         response = client.post(f'/api/v1/titles/{titles[0]["id"]}/reviews/', data=data)
+        print('===>', response.json())
         assert response.status_code == 401, \
             f'Проверьте, что при POST запросе `/api/v1/titles/{{title_id}}/reviews/` ' \
             f'без токена авторизации возвращается статус 401'
