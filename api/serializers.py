@@ -1,10 +1,20 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from .models import User, Category, Genre, Title, Review, Comment, User
+import random, string, base64
+from rest_framework.exceptions import ValidationError
+from django.core.mail import send_mail
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from urllib.parse import quote
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Category, Genre, Title, Review, Comment
 import random
+
+
 
 
 def get_tokens_for_user(user):
@@ -53,7 +63,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
         model = User
 
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
@@ -61,39 +70,46 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
+     class Meta:
         fields = ('name', 'slug')
         model = Genre
 
 
+
 class CustomSlugRelatedField(serializers.SlugRelatedField):
     def to_representation(self, value):
-        return {'name': value.name, 'slug': value.slug} # для успешного прохождения тесто
-        #return value.name
-
+        return value.slug
 
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.ReadOnlyField()
     category = CustomSlugRelatedField(queryset=Category.objects.all(), 
-                                            slug_field='slug')
+                                     slug_field='slug')
     genre = CustomSlugRelatedField(queryset=Genre.objects.all(),
-                                         slug_field='slug',
-                                         many=True)
+                                   slug_field='slug',
+                                   many=True)
 
     class Meta:
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
-        model = Title    
+        model = Title  
 
+ #   class Meta:
+ #       fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+ #       model = Title   
+
+  #  def average_rating(self, title):
+ #       rating = Review.objects.filter(title_id=title.id).aggregate(Avg("score"))
+ #       return rating
 
 class ReviewSerializer(serializers.ModelSerializer):
         author = serializers.ReadOnlyField(source='author.username')
+        title = serializers
         class Meta:
-                fields = ('title', 'text', 'author', 'score', 'pub_date')
+                fields = ('id', 'text', 'author', 'score', 'pub_date')
                 model = Review
 
 
 class CommentSerializer(serializers.ModelSerializer):
         author = serializers.ReadOnlyField(source='author.username')
         class Meta:
-                fields = ('review', 'text', 'author', 'pub_date')
+                fields = ('id', 'text', 'author', 'pub_date')
                 model = Comment
