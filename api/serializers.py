@@ -23,7 +23,7 @@ class UserSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ("email",)
+        fields = ('first_name', 'last_name', 'username', 'bio', "email", 'role',)
     
     def validate(self, data):
         confirmation_code = generate_code()
