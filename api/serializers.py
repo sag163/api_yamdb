@@ -87,13 +87,14 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
         author = serializers.ReadOnlyField(source='author.username')
+        title = serializers
         class Meta:
-                fields = ('title', 'text', 'author', 'score', 'pub_date')
+                fields = ('id', 'text', 'author', 'score', 'pub_date')
                 model = Review
 
 
 class CommentSerializer(serializers.ModelSerializer):
         author = serializers.ReadOnlyField(source='author.username')
         class Meta:
-                fields = ('review', 'text', 'author', 'pub_date')
+                fields = ('id', 'text', 'author', 'pub_date')
                 model = Comment
