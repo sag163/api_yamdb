@@ -1,11 +1,10 @@
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from .views import (Signup, Avtorizeytion,
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
+
+from .views import (SignUpView, SignInView,
                     UserViewSet, UserMeViewSet,
                     TitleViewSet, CategoryViewSet, GenreViewSet,
                     ReviewViewSet, CommentViewSet)
@@ -23,12 +22,12 @@ comment_router.register(r'comments', CommentViewSet, basename="comment")
 
 
 urlpatterns = [
-    path('users/me/', UserMeViewSet.as_view({'get': 'retrieve', 'patch': 'partial_update'})),
+    path('users/me/', UserMeViewSet.as_view({'get': 'retrieve',
+                                             'patch': 'partial_update'})),
     path('', include(router.urls)),
     path('', include(review_router.urls)),
     path('', include(comment_router.urls)),
-    path('auth/email/', Signup.as_view()),
-    path('auth/token/', Avtorizeytion.as_view()),
+    path('auth/email/', SignUpView.as_view()),
+    path('auth/token/', SignInView.as_view()),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
-
