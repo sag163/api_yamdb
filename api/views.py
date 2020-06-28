@@ -119,7 +119,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.AllowAny]#, IsOwnerOrReadOnly]
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    #permission_classes = [permissions.AllowAny]#, IsOwnerOrReadOnly]
   
    
     def get_title(self):
@@ -131,28 +132,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
     def update_rating(self):
-        title = self.get_title()
+        title = get_object_or_404(Title, id=self.kwargs['titles_pk'])
+        #title = self.get_title()
         average_rating = Review.objects.filter(title=title).aggregate(Avg("score"))
-        title.score = average_rating
+        print(average_rating)
+        title.rating = round(average_rating['score__avg'], 1)
+        print(title.rating)
         title.save()
+
 
     
 
     def perform_create(self, serializer):
         pk=self.kwargs.get("titles_pk")
-        print('==========>>>>>', pk)
         title = get_object_or_404(Title, pk=self.kwargs.get("titles_pk"))
-        print('==========>>>>>', title)
         review = Review.objects.filter(title_id=title.id, author=self.request.user)
         if self.request.method == 'POST' and review:
             raise ValidationError('Можно оставить только один отзыв на одно произведение.')
         serializer.save(author=self.request.user, title_id=self.kwargs.get("titles_pk"))
         self.update_rating()
 
-    #def partial_update(self, request, titles_pk, pk=None):
-    #    review = get_object_or_404(Review, pk=titles_pk)
-    #    serializer = ReviewSerializer(review, data=request.data, partial=True)
-    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, titles_pk, pk=None):
             if not request.user.is_authenticated:
@@ -163,16 +162,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_403_FORBIDDEN)
             if serializer.is_valid():
                 serializer.save(author=request.user, title_id=titles_pk)
+                self.update_rating()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, title_id, pk=None):
+    def destroy(self, request, titles_pk, pk=None):
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         review = get_object_or_404(Review, pk=pk)
         if review.author != request.user and request.user.role != 'moderator':
             return Response(status=status.HTTP_403_FORBIDDEN)
         review.delete()
+        self.update_rating()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -206,6 +207,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             serializer.save(author=request.user, review_id=review_pk)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def destroy(self, request, titles_pk, review_pk, pk=None):
         comment = get_object_or_404(Comment, pk=pk)

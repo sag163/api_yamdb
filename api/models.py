@@ -40,7 +40,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.TextField()
     year = models.IntegerField()
-    rating = models.IntegerField(blank=True, null=True)
+    rating = models.FloatField(blank=True, null=True)
     description = models.TextField()
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,

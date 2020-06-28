@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Category, Genre, Title, Review, Comment
 import random
-from django.db.models import Avg
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
