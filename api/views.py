@@ -19,6 +19,7 @@ from .serializers import (UserSerializer,
                           UserSerializers,
                           UserAvtorizaytion)
 from .filters import CustomFilterBackend
+from .permissions import IsAdminUser, IsAdminOrReadOnlyPermission
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination
@@ -50,6 +51,7 @@ class Signup(generics.CreateAPIView):
             )
             return Response(serializer.data)
 
+
 class Avtorizeytion(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -63,6 +65,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'username'
@@ -72,6 +75,7 @@ class UserMeViewSet(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = None
     lookup_field = None
 
@@ -91,6 +95,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnlyPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -103,6 +108,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnlyPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -112,6 +118,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnlyPermission]
     filter_backends = [CustomFilterBackend]
     filterset_fields = ['category', 'genre', 'year', 'name']
 
@@ -127,6 +134,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

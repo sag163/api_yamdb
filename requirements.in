@@ -3,3 +3,5 @@ requests
 django
 djangorestframework
 django-filter
+djangorestframework_simplejwt
+drf-nested-routers
