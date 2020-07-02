@@ -5,10 +5,10 @@ from .models import Category, Genre
 
 class CustomFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        category_slug = request.query_params.get('category')
-        genre_slug = request.query_params.get('genre')
-        name = request.query_params.get('name')
-        year = request.query_params.get('year')
+        category_slug = request.query_params.get("category")
+        genre_slug = request.query_params.get("genre")
+        name = request.query_params.get("name")
+        year = request.query_params.get("year")
         if genre_slug:
             genre_id = Genre.objects.get(slug=genre_slug).id
             return queryset.filter(genre=genre_id)
